@@ -1,21 +1,24 @@
 import 'package:dio/dio.dart';
 
-import 'models/carsList/carsListdart';
-import 'models/carsMod/cars.dart';
+import 'models/carsList/carsList.dart';
 
 void main(List<String> arguments) async {
-  Dio client = Dio();
+  Dio httpClient = Dio();
   String url = 'https://myfakeapi.com/api/cars/';
+  var response = await httpClient.get(url);
+  CarsList carsList = CarsList.fromJson(response.data);
 
-  var response = await client.get(url);
-  CarsList data = CarsList.fromJson(response.data);
-
-  List<Cars> carsMassive = data.cars;
-  double minimum = 1000000.0;
+  double minP = double.infinity;
   int id = 0;
-  for (var el in carsMassive) {
-    id += el.id;
-    print(el.title); 
+
+  for (var el in carsList.cars) {
+    String ss = el.price;
+    ss = ss.substring(1, 8);
+    double curPrice = double.parse(ss);
+    if (curPrice < minP && el.availability) {
+      minP = curPrice;
+      id = el.id;
+    }
   }
-  print("кол-во продукции: ${count}");
+  print("id машины с минимальной ценой: ${id} ");
 }
